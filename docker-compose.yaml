@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  hue:
+    image: gethue/hue:20201215-135001
+    hostname: hue
+    container_name: hue
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./conf/hue/z-hue.ini:/usr/share/hue/desktop/conf/z-hue.ini
+      - ./conf/hue/log.conf:/usr/share/hue/desktop/conf/log.conf
+      - ./conf/hive-conf/:/etc/hive/conf/
+    depends_on:
+    - database
+    networks:
+      - backend
+    extra_hosts:
+      - "my-cdh-namenode-vip.example.com:192.0.2.1"
+      - "my-cdh-hiveserver2.example.com:192.0.2.2"
+      - "my-cdh-m01.example.com:192.0.2.3"
+      - "my-cdh-m02.example.com:192.0.2.4"
+      - "my-cdh-m03.example.com:192.0.2.5"
+      - "my-cdh-w01.example.com:192.0.2.6"
+
+  database:
+    image: mysql:8.0
+    hostname: database
+    container_name: database
+    env_file:
+      - ./env/database.env
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0 --init-file /data/application/init.sql
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/init.sql:/data/application/init.sql
+#      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+#      - ./db/sql:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+networks:
+  backend:
+
+
