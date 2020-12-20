@@ -28,12 +28,11 @@ services:
     container_name: database
     env_file:
       - ./env/database.env
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0 --init-file /data/application/init.sql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
     volumes:
       - ./db/data:/var/lib/mysql
-      - ./db/init.sql:/data/application/init.sql
+      - ./db/sql:/docker-entrypoint-initdb.d
 #      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
-#      - ./db/sql:/docker-entrypoint-initdb.d
     networks:
       - backend
 
